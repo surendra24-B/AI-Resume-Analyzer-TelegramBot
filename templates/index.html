@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        AI Resume Analyzer
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+    <header>
+
+        <h1>
+            🤖 AI Resume Analyzer
+        </h1>
+
+        <p>
+            Analyze resumes against job descriptions
+            using AI-powered ATS analysis.
+        </p>
+
+    </header>
+
+
+    <section class="card">
+
+        <form
+            action="/analyze"
+            method="POST"
+            enctype="multipart/form-data"
+        >
+
+            <label>
+                Job Description
+            </label>
+
+            <textarea
+                name="job_description"
+                placeholder="Paste the job description here..."
+                required
+            ></textarea>
+
+
+            <label>
+                Upload Resume(s)
+            </label>
+
+            <input
+                type="file"
+                name="resumes"
+                accept=".pdf,.docx,.txt"
+                multiple
+                required
+            >
+
+
+            <p class="help">
+                Supported formats: PDF, DOCX, TXT
+            </p>
+
+
+            <button type="submit">
+                Analyze Resume(s)
+            </button>
+
+        </form>
+
+    </section>
+
+
+    {% if error %}
+
+    <div class="error">
+
+        {{ error }}
+
+    </div>
+
+    {% endif %}
+
+
+    {% if results %}
+
+    <section>
+
+        <h2>
+            Candidate Ranking
+        </h2>
+
+
+        {% for result in results %}
+
+
+        {% if result.error %}
+
+        <div class="card error">
+
+            <h3>
+                {{ result.filename }}
+            </h3>
+
+            <p>
+                {{ result.error }}
+            </p>
+
+        </div>
+
+        {% else %}
+
+
+        <div class="result-card">
+
+            <div class="candidate-header">
+
+                <div>
+
+                    <h2>
+                        {{ result.candidate_name
+                           or result.filename }}
+                    </h2>
+
+                    <p>
+                        {{ result.filename }}
+                    </p>
+
+                </div>
+
+
+                <div class="score">
+
+                    <span>
+                        ATS Score
+                    </span>
+
+                    <strong>
+                        {{ result.ats_score }}/100
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="summary">
+
+                <h3>
+                    Candidate Summary
+                </h3>
+
+                <p>
+                    {{ result.summary }}
+                </p>
+
+            </div>
+
+
+            <div class="grid">
+
+
+                <div class="section">
+
+                    <h3>
+                        ✅ Matched Skills
+                    </h3>
+
+                    <ul>
+
+                        {% for skill
+                           in result.matched_skills %}
+
+                        <li>
+                            {{ skill }}
+                        </li>
+
+                        {% else %}
+
+                        <li>
+                            No matching skills found.
+                        </li>
+
+                        {% endfor %}
+
+                    </ul>
+
+                </div>
+
+
+                <div class="section">
+
+                    <h3>
+                        ❌ Missing Skills
+                    </h3>
+
+                    <ul>
+
+                        {% for skill
+                           in result.missing_skills %}
+
+                        <li>
+                            {{ skill }}
+                        </li>
+
+                        {% else %}
+
+                        <li>
+                            No major missing skills detected.
+                        </li>
+
+                        {% endfor %}
+
+                    </ul>
+
+                </div>
+
+
+                <div class="section">
+
+                    <h3>
+                        💪 Strengths
+                    </h3>
+
+                    <ul>
+
+                        {% for item
+                           in result.strengths %}
+
+                        <li>
+                            {{ item }}
+                        </li>
+
+                        {% else %}
+
+                        <li>
+                            Not available.
+                        </li>
+
+                        {% endfor %}
+
+                    </ul>
+
+                </div>
+
+
+                <div class="section">
+
+                    <h3>
+                        ⚠️ Weaknesses
+                    </h3>
+
+                    <ul>
+
+                        {% for item
+                           in result.weaknesses %}
+
+                        <li>
+                            {{ item }}
+                        </li>
+
+                        {% else %}
+
+                        <li>
+                            Not available.
+                        </li>
+
+                        {% endfor %}
+
+                    </ul>
+
+                </div>
+
+
+            </div>
+
+
+            <div class="section">
+
+                <h3>
+                    📚 Recommended Courses
+                </h3>
+
+                <ul>
+
+                    {% for course
+                       in result.recommended_courses %}
+
+                    <li>
+                        {{ course }}
+                    </li>
+
+                    {% else %}
+
+                    <li>
+                        No course recommendations.
+                    </li>
+
+                    {% endfor %}
+
+                </ul>
+
+            </div>
+
+
+            <div class="section">
+
+                <h3>
+                    🔍 Experience Gaps
+                </h3>
+
+                <ul>
+
+                    {% for gap
+                       in result.experience_gaps %}
+
+                    <li>
+                        {{ gap }}
+                    </li>
+
+                    {% else %}
+
+                    <li>
+                        No major experience gaps identified.
+                    </li>
+
+                    {% endfor %}
+
+                </ul>
+
+            </div>
+
+
+            <div class="section">
+
+                <h3>
+                    ✏️ Resume Improvements
+                </h3>
+
+                <ul>
+
+                    {% for item
+                       in result.resume_improvements %}
+
+                    <li>
+                        {{ item }}
+                    </li>
+
+                    {% else %}
+
+                    <li>
+                        No additional improvements provided.
+                    </li>
+
+                    {% endfor %}
+
+                </ul>
+
+            </div>
+
+
+            <div class="metrics">
+
+                <div>
+
+                    <span>
+                        Skill Match
+                    </span>
+
+                    <strong>
+                        {{ result.skill_score }}%
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Keyword Match
+                    </span>
+
+                    <strong>
+                        {{ result.keyword_score }}%
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Required Skills
+                    </span>
+
+                    <strong>
+                        {{ result.required_skills|length }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        {% endif %}
+
+        {% endfor %}
+
+    </section>
+
+    {% endif %}
+
+
+</div>
+
+
+</body>
+
+</html>

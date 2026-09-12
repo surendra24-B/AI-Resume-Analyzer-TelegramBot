@@ -1,0 +1,8 @@
+Flask
+python-dotenv
+google-genai
+pypdf
+python-docx
+scikit-learn
+requests
+python-telegram-bot
